@@ -1,0 +1,163 @@
+.app-shell {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding: 32px 20px 40px;
+  box-sizing: border-box;
+}
+
+.topbar {
+  margin-bottom: 18px;
+}
+
+.topbar h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+}
+
+.topbar p {
+  margin: 0;
+  color: var(--muted-text);
+}
+
+.grid-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1.2fr 1fr;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: var(--panel-shadow);
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.stack {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 0.88rem;
+  color: var(--muted-text);
+}
+
+input,
+textarea,
+button {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+input,
+textarea {
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 10px;
+}
+
+button {
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 10px;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.chat-window {
+  min-height: 320px;
+  max-height: 420px;
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.bubble {
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+
+.bubble-user {
+  background: var(--user-bubble);
+}
+
+.bubble-assistant {
+  background: var(--assistant-bubble);
+}
+
+.chat-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.citations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.citations-list li {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: var(--input-bg);
+}
+
+.citations-list header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.muted {
+  color: var(--muted-text);
+}
+
+.error-banner,
+.status-banner {
+  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+
+.error-banner {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-banner {
+  background: #ecfccb;
+  color: #365314;
+}
+
+@media (max-width: 1024px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-window {
+    min-height: 220px;
+  }
+}
