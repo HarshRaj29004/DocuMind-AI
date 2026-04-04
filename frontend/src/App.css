@@ -19,6 +19,15 @@
   color: var(--muted-text);
 }
 
+.user-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .grid-layout {
   display: grid;
   gap: 16px;
@@ -78,6 +87,22 @@ button:disabled {
   cursor: not-allowed;
 }
 
+button.secondary {
+  background: transparent;
+  color: var(--text);
+}
+
+.auth-shell {
+  max-width: 520px;
+  margin: 40px auto;
+}
+
+.auth-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 .chat-window {
   min-height: 320px;
   max-height: 420px;
@@ -85,6 +110,21 @@ button:disabled {
   display: grid;
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.chat-session-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chat-session-bar select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
 }
 
 .bubble {

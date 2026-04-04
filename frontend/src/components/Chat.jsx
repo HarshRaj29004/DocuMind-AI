@@ -1,6 +1,14 @@
 import { useState } from 'react'
 
-function Chat({ messages, loading, onAsk }) {
+function Chat({
+  messages,
+  loading,
+  onAsk,
+  sessions,
+  activeSessionId,
+  onSwitchSession,
+  onCreateSession,
+}) {
   const [query, setQuery] = useState('')
 
   const handleSubmit = async (event) => {
@@ -16,6 +24,28 @@ function Chat({ messages, loading, onAsk }) {
   return (
     <section className="panel">
       <h2>Chat</h2>
+      <div className="chat-session-bar">
+        <select
+          value={activeSessionId}
+          onChange={(event) => onSwitchSession(event.target.value)}
+          disabled={loading}
+        >
+          {sessions.map((session) => (
+            <option key={session.id} value={session.id}>
+              {session.title}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="secondary"
+          onClick={onCreateSession}
+          disabled={loading}
+        >
+          New chat
+        </button>
+      </div>
+
       <div className="chat-window">
         {messages.map((message, index) => (
           <article

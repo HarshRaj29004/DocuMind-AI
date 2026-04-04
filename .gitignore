@@ -1,5 +1,7 @@
 # Secrets and environment files
 *.env
+*.json
+*.db
 
 # Python backend
 backend/venv/
