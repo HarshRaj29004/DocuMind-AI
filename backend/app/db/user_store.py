@@ -70,5 +70,5 @@ class SupabaseUserStore:
             "id": row.get("id"),
             "name": row.get("name"),
             "email": row.get("email"),
-            "password_hash": row.get("password_hash", ""),
+            "hashed_password": row.get("hashed_password", ""),
         }

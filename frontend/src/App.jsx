@@ -12,7 +12,7 @@ function App() {
   const [citations, setCitations] = useState([])
   const auth = useAuth()
   const ingestion = useIngestion()
-  const chat = useChat(setCitations)
+  const chat = useChat(setCitations, Boolean(auth.user))
 
   const handleAsk = async (query) => {
     await chat.askQuestion(query)
@@ -73,6 +73,7 @@ function App() {
           activeSessionId={chat.activeSessionId}
           onSwitchSession={chat.switchChatSession}
           onCreateSession={chat.createChatSession}
+          onDeleteSession={chat.deleteChatSession}
         />
 
         <SourceCitations citations={citations} />

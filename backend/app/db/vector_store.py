@@ -30,6 +30,7 @@ class InMemoryVectorStore:
 
         self._index = self._pc.Index(self._index_name)
         self._lock = Lock()
+        self._user_chunk_counts: dict[int, int] = {}
 
     def _get_existing_index_names(self) -> set[str]:
         indexes = self._pc.list_indexes()
@@ -80,6 +81,8 @@ class InMemoryVectorStore:
 
         if vectors:
             self._index.upsert(vectors=vectors)
+            with self._lock:
+                self._user_chunk_counts[user_id] = self._user_chunk_counts.get(user_id, 0) + len(vectors)
         return len(vectors)
 
     def query(self, query_text: str, user_id: int, top_k: int = 4) -> list[dict]:
@@ -109,9 +112,10 @@ class InMemoryVectorStore:
         return results
 
     def stats(self, user_id: int | None = None) -> dict[str, int]:
-        if user_id is None:
-            info = self._index.describe_index_stats()
-        else:
-            info = self._index.describe_index_stats(filter={"user_id": {"$eq": user_id}})
+        if user_id is not None:
+            with self._lock:
+                return {"chunks": int(self._user_chunk_counts.get(user_id, 0))}
+
+        info = self._index.describe_index_stats()
         info_dict = self._as_dict(info)
         return {"chunks": int(info_dict.get("total_vector_count", 0))}

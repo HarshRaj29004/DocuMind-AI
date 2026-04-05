@@ -1,5 +1,10 @@
-import { useState } from 'react'
-import { sendChat } from '../services/api'
+import { useEffect, useState } from 'react'
+import {
+  createChatWindow,
+  deleteChatWindow,
+  listChatWindows,
+  sendChat,
+} from '../services/api'
 
 const INITIAL_ASSISTANT_MESSAGE = {
   role: 'assistant',
@@ -9,8 +14,16 @@ const INITIAL_ASSISTANT_MESSAGE = {
 
 function createSession(index) {
   return {
-    id: `chat-${Date.now()}-${index}`,
+    id: index,
     title: `Chat ${index}`,
+    messages: [{ ...INITIAL_ASSISTANT_MESSAGE }],
+  }
+}
+
+function mapWindowToSession(window, fallbackIndex) {
+  return {
+    id: Number(window.id),
+    title: window.title || `Chat ${fallbackIndex}`,
     messages: [{ ...INITIAL_ASSISTANT_MESSAGE }],
   }
 }
@@ -24,31 +37,98 @@ function getLatestSources(messages) {
   return []
 }
 
-export function useChat(onSourcesUpdate) {
+export function useChat(onSourcesUpdate, isEnabled = true) {
   const [sessions, setSessions] = useState([createSession(1)])
   const [activeSessionId, setActiveSessionId] = useState(sessions[0].id)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  useEffect(() => {
+    if (!isEnabled) {
+      return
+    }
+
+    const initializeChatWindows = async () => {
+      try {
+        const payload = await listChatWindows()
+        let nextSessions = (payload.chat_windows || []).map((window, index) =>
+          mapWindowToSession(window, index + 1)
+        )
+
+        if (!nextSessions.length) {
+          const created = await createChatWindow('Chat 1')
+          nextSessions = [mapWindowToSession(created, 1)]
+        }
+
+        setSessions(nextSessions)
+        setActiveSessionId(nextSessions[0].id)
+        if (onSourcesUpdate) {
+          onSourcesUpdate([])
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to load chat windows')
+      }
+    }
+
+    initializeChatWindows()
+  }, [isEnabled, onSourcesUpdate])
+
   const activeSession = sessions.find((session) => session.id === activeSessionId) || sessions[0]
 
-  const createChatSession = () => {
+  const createChatSession = async () => {
     setError(null)
-    const nextIndex = sessions.length + 1
-    const nextSession = createSession(nextIndex)
-    setSessions((prev) => [...prev, nextSession])
-    setActiveSessionId(nextSession.id)
-    if (onSourcesUpdate) {
-      onSourcesUpdate([])
+    try {
+      const nextIndex = sessions.length + 1
+      const created = await createChatWindow(`Chat ${nextIndex}`)
+      const nextSession = mapWindowToSession(created, nextIndex)
+      setSessions((prev) => [...prev, nextSession])
+      setActiveSessionId(nextSession.id)
+      if (onSourcesUpdate) {
+        onSourcesUpdate([])
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to create chat window')
+      throw err
     }
   }
 
   const switchChatSession = (sessionId) => {
-    setActiveSessionId(sessionId)
+    const normalizedId = Number(sessionId)
+    setActiveSessionId(normalizedId)
     setError(null)
-    const nextSession = sessions.find((session) => session.id === sessionId)
+    const nextSession = sessions.find((session) => session.id === normalizedId)
     if (nextSession && onSourcesUpdate) {
       onSourcesUpdate(getLatestSources(nextSession.messages))
+    }
+  }
+
+  const deleteChatSession = async (sessionId) => {
+    setError(null)
+    if (sessions.length <= 1) {
+      return
+    }
+
+    try {
+      await deleteChatWindow(sessionId)
+      setSessions((prev) => {
+        const removedIndex = prev.findIndex((session) => session.id === sessionId)
+        if (removedIndex === -1) {
+          return prev
+        }
+
+        const nextSessions = prev.filter((session) => session.id !== sessionId)
+        if (activeSessionId === sessionId) {
+          const fallback = nextSessions[Math.max(0, removedIndex - 1)] || nextSessions[0]
+          setActiveSessionId(fallback.id)
+          if (onSourcesUpdate) {
+            onSourcesUpdate(getLatestSources(fallback.messages))
+          }
+        }
+        return nextSessions
+      })
+    } catch (err) {
+      setError(err.message || 'Failed to delete chat window')
+      throw err
     }
   }
 
@@ -100,5 +180,6 @@ export function useChat(onSourcesUpdate) {
     askQuestion,
     createChatSession,
     switchChatSession,
+    deleteChatSession,
   }
 }

@@ -8,6 +8,7 @@ function Chat({
   activeSessionId,
   onSwitchSession,
   onCreateSession,
+  onDeleteSession,
 }) {
   const [query, setQuery] = useState('')
 
@@ -43,6 +44,18 @@ function Chat({
           disabled={loading}
         >
           New chat
+        </button>
+        <button
+          type="button"
+          className="danger"
+          onClick={() => {
+            if (window.confirm('Delete this chat window?')) {
+              onDeleteSession(activeSessionId)
+            }
+          }}
+          disabled={loading || sessions.length <= 1}
+        >
+          Delete chat
         </button>
       </div>
 

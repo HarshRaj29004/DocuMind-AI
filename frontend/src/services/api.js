@@ -79,6 +79,30 @@ export async function sendChat(query, topK = 4) {
   return parseResponse(response)
 }
 
+export async function listChatWindows() {
+  const response = await fetch(`${API_BASE_URL}/chat-windows`, {
+    headers: { ...getAuthHeaders() },
+  })
+  return parseResponse(response)
+}
+
+export async function createChatWindow(title) {
+  const response = await fetch(`${API_BASE_URL}/chat-windows`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ title }),
+  })
+  return parseResponse(response)
+}
+
+export async function deleteChatWindow(windowId) {
+  const response = await fetch(`${API_BASE_URL}/chat-windows/${windowId}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeaders() },
+  })
+  return parseResponse(response)
+}
+
 export async function registerUser(name, email, password) {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
